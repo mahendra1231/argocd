@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_IMAGE: mahendra968/mahendra
+  DOCKER_IMAGE: mahendra968/mahendra2
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
@@ -31,18 +31,37 @@ jobs:
     - name: Setup kubectl
       uses: azure/setup-kubectl@v1
     
+    - name: Create kubeconfig
+      run: |
+        mkdir -p $HOME/.kube
+        cat > $HOME/.kube/config <<EOF
+        apiVersion: v1
+        kind: Config
+        clusters:
+        - cluster:
+            certificate-authority-data: ${{ secrets.KUBE_CA_DATA }}
+            server: ${{ secrets.KUBE_API_URL }}
+          name: my-cluster
+        contexts:
+        - context:
+            cluster: my-cluster
+            user: github-actions
+          name: my-cluster-context
+        current-context: my-cluster-context
+        users:
+        - name: github-actions
+          user:
+            token: ${{ secrets.KUBE_TOKEN }}
+        EOF
+        chmod 600 $HOME/.kube/config
+    
+    - name: Test connection
+      run: kubectl get nodes
+    
     - name: Deploy to Kubernetes
       run: |
-        echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
-        export KUBECONFIG=kubeconfig.yaml
-        
-        # Debug: Check kubeconfig content
-        cat kubeconfig.yaml
-        
-        # Replace image tag in deployment file
         sed -i "s|\${DOCKER_IMAGE}|$DOCKER_IMAGE|g" k8s/deployment.yaml
         sed -i "s|\${IMAGE_TAG}|$IMAGE_TAG|g" k8s/deployment.yaml
         
-        # Apply Kubernetes manifests
-        kubectl apply -f k8s/deployment.yaml
-        kubectl apply -f k8s/service.yaml
+        kubectl apply -f k8s/deployment.yaml --validate=false
+        kubectl apply -f k8s/service.yaml --validate=false

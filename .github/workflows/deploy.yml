@@ -14,12 +14,14 @@ spec:
         app: sample-app
     spec:
       containers:
-      - name: nginx
-        image: nginx:latest
+      - name: sample-app
+        image: ${DOCKER_IMAGE}:${IMAGE_TAG}
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "250m"
+            memory: "256Mi"
+            cpu: "200m"
           limits:
-            memory: "128Mi"
+            memory: "512Mi"
             cpu: "500m"
+        ports:
+        - containerPort: 80

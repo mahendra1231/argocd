@@ -32,8 +32,8 @@ jobs:
 
     - name: Deploy to Remote Server (VM)
       run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} user@your-server-ip "
+        ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} mahendra@172.25.1.112 "
           docker pull $DOCKER_IMAGE:${{ env.IMAGE_TAG }} &&
           docker stop your-container-name || true &&
           docker rm your-container-name || true &&
-          docker run -d --name your-container-name $DOCKER_IMAGE:${{ env.IMAGE_TAG }}"
+          docker run -d --name deploy1 $DOCKER_IMAGE:${{ env.IMAGE_TAG }}"

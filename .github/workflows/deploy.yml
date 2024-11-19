@@ -55,9 +55,6 @@ jobs:
         EOF
         chmod 600 $HOME/.kube/config
     
-    - name: Test connection
-      run: kubectl get nodes
-    
     - name: Deploy to Kubernetes
       run: |
         sed -i "s|\${DOCKER_IMAGE}|$DOCKER_IMAGE|g" k8s/deployment.yaml

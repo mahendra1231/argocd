@@ -36,6 +36,9 @@ jobs:
         echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
         export KUBECONFIG=kubeconfig.yaml
         
+        # Debug: Check kubeconfig content
+        cat kubeconfig.yaml
+        
         # Replace image tag in deployment file
         sed -i "s|\${DOCKER_IMAGE}|$DOCKER_IMAGE|g" k8s/deployment.yaml
         sed -i "s|\${IMAGE_TAG}|$IMAGE_TAG|g" k8s/deployment.yaml
